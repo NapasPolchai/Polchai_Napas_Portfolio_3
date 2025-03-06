@@ -1,0 +1,769 @@
+@use '../base/' as a;
+
+body {
+
+    /* Initial hidden states for animations */
+    .gsap-hidden {
+        opacity: 0;
+        transform: translateY(50px);
+        /* For downward entry effect */
+    }
+
+    .gsap-scale-hidden {
+        opacity: 0;
+        transform: scale(0.8);
+        /* For scaling effect */
+    }
+
+    .hide-mob {
+        display: none;
+    }
+
+    .hero {
+        margin-top: 128px;
+        margin-bottom: 128px;
+        opacity: 0;
+        transform: translateX(-400px);
+
+        h2 {
+            font-size: 32px;
+            font-weight: 400;
+
+            span {
+                font-style: italic;
+                font-weight: 300;
+            }
+        }
+
+        #reel {
+            img {
+                border-radius: 50px;
+                width: 100%;
+                height: 45px;
+                object-fit: cover;
+            }
+        }
+    }
+
+
+    #player-container {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0px 16px 40px #9D9D9D33;
+        border-radius: 16px;
+        margin-top: -72px;
+
+        &:hover {
+            .video-controls {
+                opacity: 1;
+                border-radius: 0 0 24px 24px;
+            }
+        }
+    }
+
+    .video-controls.hidden {
+        display: none;
+    }
+
+    .video-controls {
+        right: 0;
+        left: 0;
+        padding: 8px;
+        position: absolute;
+        bottom: 0px;
+        transition: all 0.2s ease;
+        background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.5));
+        display: flex;
+        opacity: 1;
+        border-radius: 0 0 16px 16px;
+
+        @media screen and (max-width: 540px) {
+            padding: 0px 16px;
+
+            button {
+                padding: 0;
+                margin: 0;
+            }
+
+            .fa {
+                font-size: 16px;
+                margin-left: 0;
+            }
+        }
+    }
+
+    .video-controls.hide {
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    button {
+        padding: 0;
+        border: 0;
+        background-color: transparent;
+    }
+
+    .fa,
+    .fa-solid {
+        color: #fff;
+        font-size: 24px;
+        margin-left: 8px;
+        margin-right: 16px;
+    }
+
+    .fa-stop-circle-o {
+        margin-right: 20px;
+    }
+
+    .fa-volume-up {
+        margin-left: 24px;
+        margin-right: -8px;
+        margin-top: 13px;
+    }
+
+    /* range inputs are a pain to style
+      
+      https://range-input-css.netlify.app/
+      
+      */
+
+    /*********** Baseline, reset styles ***********/
+    input[type="range"] {
+        -webkit-appearance: none;
+        appearance: none;
+        background: transparent;
+        cursor: pointer;
+        width: 15rem;
+    }
+
+    /* Removes default focus */
+    input[type="range"]:focus {
+        outline: none;
+    }
+
+    /******** Chrome, Safari, Opera and Edge Chromium styles ********/
+    /* slider track */
+    input[type="range"]::-webkit-slider-runnable-track {
+        background-color: #ffffff;
+        border-radius: 0.5rem;
+        height: 0.5rem;
+    }
+
+    /* slider thumb */
+    input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        /* Override default look */
+        appearance: none;
+        margin-top: -4px;
+        /* Centers thumb on the track */
+        background-color: #808080;
+        border-radius: 0.5rem;
+        height: 1rem;
+        width: 1rem;
+    }
+
+    input[type="range"]:focus::-webkit-slider-thumb {
+        outline: 3px solid #808080;
+        outline-offset: 0.125rem;
+    }
+
+    /*********** Firefox styles ***********/
+    /* slider track */
+    input[type="range"]::-moz-range-track {
+        background-color: #ffffff;
+        border-radius: 0.5rem;
+        height: 0.5rem;
+    }
+
+    /* slider thumb */
+    input[type="range"]::-moz-range-thumb {
+        background-color: #808080;
+        border: none;
+        /*Removes extra border that FF applies*/
+        border-radius: 0.5rem;
+        height: 1rem;
+        width: 1rem;
+    }
+
+    input[type="range"]:focus::-moz-range-thumb {
+        outline: 3px solid #808080;
+        outline-offset: 0.125rem;
+    }
+
+
+
+    #about {
+        margin-bottom: 128px;
+        margin-top: 72px;
+        // transform: translateX(-200px);
+        // opacity: 0;
+
+        #about-text {
+            font-family: poppins;
+            font-size: 32px;
+            font-weight: 400;
+            margin-top: 0px;
+        }
+
+        #status-bar {
+            display: flex;
+            align-items: center;
+            margin-bottom: 24px;
+            width: 128px;
+            height: 22px;
+            background-color: rgb(108, 237, 191, 0.16);
+            padding-left: 8px;
+            padding-right: 8px;
+            padding-top: 1px;
+            padding-bottom: 1px;
+            border-radius: 20px;
+            gap: 6px;
+        }
+
+        #status-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            opacity: 100%;
+            background-color: #6CEDBF;
+        }
+
+        #status-text {
+            font-size: 14px;
+            letter-spacing: 3.36px;
+            color: #000000;
+            text-transform: uppercase;
+            font-style: normal;
+            opacity: 1;
+            font-weight: 300;
+            margin-top: 1px;
+        }
+    }
+
+
+    #bg-black-1 {
+        background-color: #000;
+        color: #fff;
+        margin-top: 144px;
+        border-radius: 0px;
+
+        #skill-1 {
+            position: relative;
+
+            .ui-img-1 {
+                height: 494px;
+                position: absolute;
+                top: -200px;
+                margin-top: 128px;
+
+                img {
+                    height: 100%;
+                    object-fit: cover;
+
+                }
+
+            }
+
+            p {
+                margin-top: 452px;
+                margin-bottom: 48px;
+                width: 100%;
+            }
+        }
+
+        .skills {
+            p {
+                width: 100%;
+                margin-bottom: 128px;
+            }
+        }
+
+    }
+
+    .fea-head {
+        margin-bottom: 72px;
+
+        h2 {
+
+
+
+            span {
+                font-size: 32px;
+                font-weight: 400;
+            }
+
+
+            .move {
+                font-weight: 300;
+                margin-left: 72px;
+            }
+        }
+    }
+
+    .card {
+        img {
+            height: 494px;
+            object-fit: cover;
+            width: 100%;
+        }
+
+        p {
+            width: 100%;
+        }
+    }
+
+    .prof-skill {
+        img {
+            border-radius: 0;
+            margin-bottom: -7px;
+        }
+    }
+
+    .prof-text {
+        .text {
+            margin-top: 72px;
+
+
+            p {
+                margin: 0;
+                width: 100%;
+                margin-bottom: 72px;
+            }
+
+            .spesh-p {
+                margin-bottom: 0;
+            }
+
+            h2 {
+                margin-bottom: 48px;
+            }
+
+        }
+    }
+
+    footer {
+        margin-top: 0;
+        color: #fff;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+
+        .footer-vid {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+
+        }
+
+        .footer-con {
+            padding-top: 128px;
+            padding-bottom: 128px;
+            position: relative;
+            z-index: 1;
+
+            h2 {
+                font-size: 72px;
+                line-height: 1;
+            }
+
+            .tell {
+                font-size: 72px;
+                text-transform: uppercase;
+                border-radius: 50px;
+                margin-top: 16px;
+                margin-bottom: 72px;
+                border: 1px solid #fff;
+                padding: 8px 24px;
+            }
+
+            #btn-1 {
+                margin-bottom: 16px;
+                border: 1px solid #fff;
+                padding: 8px 24px;
+            }
+
+            #btn-2 {
+                margin-bottom: 16px;
+                border: 1px solid #fff;
+                padding: 8px 24px;
+            }
+        }
+    }
+
+
+}
+
+
+@media screen and (min-width: 768px) {
+    body {
+
+        #about {
+            #about-text {
+                font-family: poppins;
+                font-size: 32px;
+                font-weight: 400;
+                margin-top: 128px;
+            }
+        }
+
+
+        .hide-desk {
+            display: none;
+        }
+
+        .hide-mob {
+            display: block;
+        }
+
+        .hero {
+            opacity: 0;
+            transform: translate3d(-200px, 0, 0);
+
+
+            h2 {
+                font-size: 72px;
+
+                span {
+                    font-weight: 300;
+                }
+
+            }
+
+            #reel {
+                margin-top: 8px;
+
+                img {
+
+                    height: 101px;
+
+
+                }
+            }
+        }
+
+        #bg-black-1 {
+            border-radius: 24px;
+        }
+
+
+
+        #player-container {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0px 16px 40px #9D9D9D33;
+            border-radius: 24px;
+
+            &:hover {
+                .video-controls {
+                    opacity: 1;
+                    border-radius: 0 0 24px 24px;
+                }
+            }
+        }
+
+        .video-controls.hidden {
+            display: none;
+        }
+
+        .video-controls {
+            right: 0;
+            left: 0;
+            padding: 8px;
+            position: absolute;
+            bottom: 0px;
+            transition: all 0.2s ease;
+            background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.5));
+            display: flex;
+            opacity: 1;
+            border-radius: 0 0 24px 24px;
+
+            @media screen and (max-width: 540px) {
+                padding: 12px 8px;
+
+                button {
+                    padding: 0;
+                    margin: 0;
+                }
+
+                .fa {
+                    font-size: 16px;
+                    margin-left: 0;
+                }
+            }
+        }
+
+        .video-controls.hide {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        button {
+            padding: 0;
+            border: 0;
+            background-color: transparent;
+        }
+
+        .fa,
+        .fa-solid {
+            color: #fff;
+            font-size: 24px;
+            margin-left: 8px;
+            margin-right: 16px;
+        }
+
+        .fa-stop-circle-o {
+            margin-right: 20px;
+        }
+
+        .fa-volume-up {
+            margin-left: 24px;
+            margin-right: -8px;
+            margin-top: 10px;
+        }
+
+        /* range inputs are a pain to style
+          
+          https://range-input-css.netlify.app/
+          
+          */
+
+        /*********** Baseline, reset styles ***********/
+        input[type="range"] {
+            -webkit-appearance: none;
+            appearance: none;
+            background: transparent;
+            cursor: pointer;
+            width: 15rem;
+        }
+
+        /* Removes default focus */
+        input[type="range"]:focus {
+            outline: none;
+        }
+
+        /******** Chrome, Safari, Opera and Edge Chromium styles ********/
+        /* slider track */
+        input[type="range"]::-webkit-slider-runnable-track {
+            background-color: #ffffff;
+            border-radius: 0.5rem;
+            height: 0.5rem;
+        }
+
+        /* slider thumb */
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            /* Override default look */
+            appearance: none;
+            margin-top: -4px;
+            /* Centers thumb on the track */
+            background-color: #808080;
+            border-radius: 0.5rem;
+            height: 1rem;
+            width: 1rem;
+        }
+
+        input[type="range"]:focus::-webkit-slider-thumb {
+            outline: 3px solid #808080;
+            outline-offset: 0.125rem;
+        }
+
+        /*********** Firefox styles ***********/
+        /* slider track */
+        input[type="range"]::-moz-range-track {
+            background-color: #ffffff;
+            border-radius: 0.5rem;
+            height: 0.5rem;
+        }
+
+        /* slider thumb */
+        input[type="range"]::-moz-range-thumb {
+            background-color: #808080;
+            border: none;
+            /*Removes extra border that FF applies*/
+            border-radius: 0.5rem;
+            height: 1rem;
+            width: 1rem;
+        }
+
+        input[type="range"]:focus::-moz-range-thumb {
+            outline: 3px solid #808080;
+            outline-offset: 0.125rem;
+        }
+
+        #memoji {
+            display: block;
+            margin-top: 142px;
+            margin-bottom: 142px;
+            transition: transform 0.8s ease;
+            width: 100%;
+            height: 200px;
+        }
+
+        #memoji:hover {
+            transform: scale(1.1);
+        }
+
+        #bg-black-1 {
+            background-color: #000;
+            color: #fff;
+            margin-top: 144px;
+
+            .card {
+                p {
+                    width: 80%;
+                }
+            }
+
+            #skill-1 {
+                p {
+                    width: 80%;
+                }
+            }
+
+            #skill-2 {
+                position: relative;
+
+                .ui-img-1 {
+                    height: 494px;
+                    position: absolute;
+                    top: -200px;
+                    margin-top: 128px;
+
+                    img {
+                        height: 100%;
+                        object-fit: cover;
+
+                    }
+
+                }
+
+                p {
+                    margin-top: 454px;
+                }
+
+
+            }
+
+            .skills {
+                p {
+                    width: 100%;
+                    margin-bottom: 128px;
+                }
+            }
+
+        }
+
+        .prof-skill {
+            padding: 128px 0 128px 0;
+
+            img {
+                width: 100%;
+                border-radius: 24px;
+            }
+        }
+
+        .prof-text {
+
+            .text {
+                margin-top: 128px;
+
+
+                p {
+                    margin: 0;
+                    width: 100%;
+                    margin-bottom: 72px;
+                }
+
+                .spesh-p {
+                    margin-bottom: 24px;
+                }
+
+                h2 {
+                    margin-bottom: 48px;
+                    font-size: 72px;
+                    line-height: 1;
+                }
+
+            }
+        }
+
+        .fea-head {
+            margin-bottom: 72px;
+
+            h2 {
+
+
+
+                span {
+                    font-size: 72px;
+                    font-weight: 400;
+                }
+
+
+                .move {
+                    font-weight: 300;
+                    margin-left: 72px;
+                }
+            }
+        }
+
+
+    }
+
+    footer {
+        margin-top: 0;
+        color: #fff;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+
+        .footer-vid {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+
+        }
+
+        .footer-con {
+            padding-top: 128px;
+            padding-bottom: 128px;
+            position: relative;
+            z-index: 1;
+
+            h2 {
+                font-size: 128px;
+                line-height: 1;
+            }
+
+            .tell {
+                font-size: 128px;
+                text-transform: uppercase;
+                border-radius: 50px;
+                margin-top: 16px;
+                margin-bottom: 72px;
+                border: 1px solid #fff;
+                padding: 8px 24px;
+            }
+
+            #btn-1 {
+                margin-bottom: 16px;
+                border: 1px solid #fff;
+                padding: 8px 24px;
+            }
+
+            #btn-2 {
+                margin-bottom: 16px;
+                border: 1px solid #fff;
+                padding: 8px 24px;
+            }
+        }
+    }
+}

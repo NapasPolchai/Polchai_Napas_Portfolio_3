@@ -1,0 +1,190 @@
+.experiences-title {
+
+    h1 {
+        font-size: 48px;
+        margin-top: 72px;
+        text-align: left;
+        line-height: 56px;
+        opacity: 1;
+    }
+}
+
+#title-des {
+    font-size: 16px;
+    font-weight: 300;
+    margin-top: 24px;
+    margin-bottom: 72px;
+    line-height: 1;
+    text-transform: uppercase;
+    letter-spacing: 3.84px;
+    opacity: 0.32;
+    text-align: left;
+    width: 100%;
+}
+
+.experience-card {
+    padding: 32px;
+    border-radius: 24px;
+    box-shadow: 0px 16px 40px #9D9D9D33;
+    margin-bottom: 128px;
+}
+
+.experience-1 {
+    display: block;
+    gap: 24px;
+    align-items: center;
+
+    h2 {
+        width: 100%;
+        font-size: 32px;
+        font-weight: 400;
+        margin-top: 32px;
+    }
+
+    p {
+        font-size: 1rem;
+        opacity: 0.48;
+        margin-bottom: 26px;
+        margin-top: 24px;
+        letter-spacing: 0px;
+    }
+}
+
+.add-your-company {
+    display: flex;
+    gap: 32px;
+    align-items: center;
+
+    h2 {
+        width: 100%;
+        font-size: 24px;
+        font-weight: 300;
+        opacity: 0.24;
+        margin-top: 32px;
+    }
+}
+
+.underline {
+    border: 0.1px solid #707070;
+    opacity: 0.05;
+    margin-top: 0px;
+    margin-bottom: 0px;
+
+}
+
+#num1 {
+    h2 {
+        font-size: 72px;
+        font-weight: 300;
+        text-align: center;
+    }
+
+    p {
+        width: 100%;
+        opacity: 0.32;
+        margin-top: 0px;
+        text-align: center;
+    }
+}
+
+#middle-img {
+    width: 100%;
+    margin-top: 56px;
+}
+
+.clients {
+    margin-top: 128px;
+    margin-bottom: 128px;
+
+    h2 {
+        margin-bottom: 72px;
+    }
+}
+
+
+
+@media screen and (min-width: 768px) {
+    body {
+        .experiences-title {
+
+            h1 {
+                font-size: 72px;
+                margin-top: 72px;
+                text-align: center;
+                line-height: 72px;
+            }
+        }
+
+        #title-des {
+            font-size: 16px;
+            font-weight: 300;
+            margin-top: 24px;
+            margin-bottom: 72px;
+            line-height: 1;
+            text-transform: uppercase;
+            letter-spacing: 3.84px;
+            opacity: 0.32;
+            text-align: center;
+            width: 100%;
+        }
+
+        .experience-card {
+            padding: 32px;
+            border-radius: 24px;
+            box-shadow: 0px 16px 40px #9D9D9D33;
+            margin-bottom: 128px;
+        }
+
+        .experience-1 {
+            display: block;
+            gap: 24px;
+            align-items: center;
+
+            h2 {
+                width: 300px;
+                font-size: 48px;
+                font-weight: 400;
+                margin-top: 32px;
+            }
+
+            p {
+                font-size: 1rem;
+                opacity: 0.48;
+                margin-bottom: 40px;
+                letter-spacing: 0px;
+                width: 670px;
+                margin-left: 476px;
+                margin-top: -62px;
+            }
+        }
+
+        .add-your-company {
+            display: flex;
+            gap: 32px;
+            align-items: center;
+        
+            h2 {
+                width: 100%;
+                font-size: 48px;
+                font-weight: 300;
+                opacity: 0.24;
+                margin-top: 32px;
+            }
+        }
+
+        #num1 {
+            h2 {
+                font-size: 72px;
+                font-weight: 300;
+                text-align: left;
+            }
+        
+            p {
+                width: 100%;
+                opacity: 0.32;
+                margin-top: 0px;
+                text-align: left;
+            }
+        }
+    }
+}
