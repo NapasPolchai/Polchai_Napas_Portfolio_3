@@ -1,127 +1,85 @@
 <?php
 require_once('../includes/connect.php');
 
-// The uploading part is done entirely by the form; the form uploads the file to a temporary location, with some metadata information about the file in the $_FILES array, which we can use to move the file to its final location.
+// Ensure the images directory exists and is writable
+$images_dir = '/Applications/MAMP/htdocs/Polchai_Napas_Portfolio_3/images/';
+if (!file_exists($images_dir)) {
+    mkdir($images_dir, 0755, true);
+}
 
-// If the script finishes and nothing happens with the original uploaded file, the file will be automatically deleted
+// Check if form was submitted with a file
+if (!isset($_FILES['img']) || $_FILES['img']['error'] == UPLOAD_ERR_NO_FILE) {
+    die('Error: No file uploaded.');
+}
 
-
-// We assume at minimum that the file may have a name that is not web-safe, with spaces or other characters, AND that the name might be already used in the database (It would delete the original file if so). We also assume that the file extension may not be web-safe, or that it may be a dangerous file type, like an .exe executable.
-
-// So we want to do this FIRST, as we need a new name for the file and for the DB insert part of the script below
-
-
-
-// create a unique, web-safe name for the image in a $newname variable
-
-$random = rand(10000,99999); //generates a random number between 10000 and 99999
-$newname = 'image'.$random; // will store something like 'image49814'
-
-
-// PHP can get the original file extension (without the '.'). It also makes sure the extension is lowercase, so 'JPG' becomes 'jpg'.
-
+// Generate a unique filename
+$random = rand(10000, 99999);
+$newname = 'image' . $random;
 $filetype = strtolower(pathinfo($_FILES['img']['name'], PATHINFO_EXTENSION));
 
-//check to see if the extension is allowed, for example...
-
-if($filetype == 'jpeg') {
-  $filetype = 'jpg'; // we want to save it as 'jpg', not 'jpeg'
+// Normalize file extension
+if ($filetype == 'jpeg') {
+    $filetype = 'jpg';
+}
+if ($filetype == 'exe') {
+    die('Error: Executable files are not allowed.');
 }
 
-if($filetype == 'exe') {
-  exit('nice try'); // we don't want to save executable files
+// Validate file type
+$allowed_types = ['jpg', 'png', 'gif'];
+if (!in_array($filetype, $allowed_types)) {
+    die('Error: Only JPG, PNG, and GIF files are allowed.');
 }
 
+$newname .= '.' . $filetype;
+$target_file = $images_dir . $newname;
 
-// ...and then append it to our new name, with the '.', so 'image49814' becomes 'image49814.jpg'. This is ALL we want to insert into the database!
-$newname .= '.'.$filetype;
+try {
+    // Check if database connection exists
+    if (!$connection) {
+        throw new Exception('Error: Database connection failed.');
+    }
 
-// Add the path to 'images' to the front of the new name, so now we have the full save path for the image file
-$target_file = '../images/'.$newname;
+    // Move the uploaded file
+    if (!move_uploaded_file($_FILES['img']['tmp_name'], $target_file)) {
+        throw new Exception('Error: Could not upload file.');
+    }
 
+    // Insert into projects table
+    $query = "INSERT INTO projects (project_title, project_description, description_type, project_type, clients_id, cover_image) 
+              VALUES (?, ?, 'Test', 'UI Design', 0, 0)";
+    $stmt = $connection->prepare($query);
+    
+    // Check if POST variables exist
+    $title = isset($_POST['title']) ? $_POST['title'] : '';
+    $desc = isset($_POST['desc']) ? $_POST['desc'] : '';
+    
+    $stmt->bindParam(1, $title, PDO::PARAM_STR);
+    $stmt->bindParam(2, $desc, PDO::PARAM_STR);
+    $stmt->execute();
 
+    // Get the last inserted project_id
+    $project_id = $connection->lastInsertId();
 
-// IF and ONLY if the file is uploaded successfully, insert the data into the database
+    // Insert into media table
+    $media_query = "INSERT INTO media (file_type, file_url, project_id) VALUES ('image', ?, ?)";
+    $media_stmt = $connection->prepare($media_query);
+    $file_url = '/images/' . $newname; // Relative path for web access
+    $media_stmt->bindParam(1, $file_url, PDO::PARAM_STR);
+    $media_stmt->bindParam(2, $project_id, PDO::PARAM_INT);
+    $media_stmt->execute();
 
-// This is the only place the database is touched, so if the file fails to upload, no data is inserted. We tie the steps together because we don't want a record in the database without an image, or an image without a record in the database.
+    // Clean up
+    $stmt = null;
+    $media_stmt = null;
+    $connection = null;
 
-if(move_uploaded_file($_FILES['img']['tmp_name'], $target_file)) {  //moves the tmp file to its final location, with its new name, before it is automatically deleted
-
-
-// PDO database insert
-
-$query = "INSERT INTO projects (title,description,image_url) VALUES (?,?,?)";
-$stmt = $connection->prepare($query);
-$stmt->bindParam(1, $_POST['title'], PDO::PARAM_STR);
-$stmt->bindParam(2, $_POST['desc'], PDO::PARAM_STR);
-$stmt->bindParam(3, $newname, PDO::PARAM_STR);  //note the $newname used here!
-$stmt->execute();
-
-
-
-$stmt = null;
-
-//Now, use the newly created id in a second query, to insert as a foreign key (project_id) into media, other tables where project_id is needed.
-
-//new INSERT query for media table, with the filename and the foreign key
-
-
-
-
-header('Location: project_list.php');
+    // Redirect on success
+    header('Location: project_list.php');
+    exit;
+} catch (Exception $e) {
+    // Log the error (in a production environment, you might want to log to a file)
+    echo 'Error: ' . $e->getMessage();
+    exit;
 }
-
-
-
-
-
-
- /* Check if image file is a actual image or another malicious file
-    if(isset($_POST['submit'])) {
-        $check = getimagesize($_FILES['uploaded']['tmp_name']);
-        if($check !== false) {
-            echo 'File is an image - ' . $check['mime'] . '.';
-            $uploadOk = 1;
-        } else {
-            echo 'File is not an image.';
-            $uploadOk = 0;
-        }
-    }
-
-    // Check if file already exists
-    if (file_exists($target_file)) {
-        echo 'Sorry, file already exists.';
-        $uploadOk = 0;
-    }
-
-    // Check file size
-    if ($_FILES['uploaded']['size'] > 500000) { // 500KB limit
-        echo 'Sorry, your file is too large.';
-        $uploadOk = 0;
-    }
-
-    // Allow certain file formats
-    if($imageFileType != 'jpg' && $imageFileType != 'png' && $imageFileType != 'jpeg'
-    && $imageFileType != 'gif' ) {
-        echo 'Sorry, only JPG, JPEG, PNG & GIF files are allowed.';
-        $uploadOk = 0;
-    }else{
-
-    }
-
-    // Check if $uploadOk is set to 0 by an error
-    if ($uploadOk == 0) {
-        echo 'Sorry, your file was not uploaded.';
-    // if everything is ok, try to upload file
-    } else {
-if (move_uploaded_file($_FILES['uploaded']['tmp_name'], $target_file)) {
-            echo 'The file '.$target_file.' has been uploaded.';
-        } else {
-            echo 'Sorry, there was an error uploading your file.';
-        }
-    }
-*/
-
-
-
 ?>

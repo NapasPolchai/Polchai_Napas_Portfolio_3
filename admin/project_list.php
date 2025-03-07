@@ -4,7 +4,7 @@
 <?php
 
 require_once('../includes/connect.php');
-$stmt = $connection->prepare('SELECT id,title FROM projects ORDER BY title ASC');
+$stmt = $connection->prepare('SELECT project_id,project_title FROM projects ORDER BY project_title ASC');
 $stmt->execute();
 ?>
 
@@ -22,10 +22,10 @@ $stmt->execute();
 while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
 
   echo  '<p class="project-list">'.
-  $row['title'].
-  '<a href="edit_project_form.php?id='.$row['id'].'">edit</a>'.
+  $row['project_title'].
+  '<a href="edit_project_form.php?id='.$row['project_id'].'">edit</a>'.
 
-  '<a href="delete_project.php?id='.$row['id'].'">delete</a></p>';
+  '<a href="delete_project.php?id='.$row['project_id'].'">delete</a></p>';
 }
 
 $stmt = null;

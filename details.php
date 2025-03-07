@@ -5,7 +5,7 @@ require_once('includes/connect.php');
 
 $query = 'SELECT * FROM books, authors WHERE author_id = authors.id AND books.id = :bookid';
 
-$stmt = $connect->prepare($query);
+$stmt = $connection->prepare($query);
 
 $bookid = $_GET['id'];
 

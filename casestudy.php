@@ -15,7 +15,7 @@ require_once('includes/connect.php');
 
 
 $query = "SELECT p.project_id, m.file_url, p.project_title, p.project_description, client_url, image, description FROM projects p JOIN media m JOIN case_studies ON case_studies.case_id = p.project_id WHERE p.project_id = :projectid LIMIT 6";
-$stmt = $connect->prepare($query);
+$stmt = $connection->prepare($query);
 
 $projectid = $_GET['project_id'];
 

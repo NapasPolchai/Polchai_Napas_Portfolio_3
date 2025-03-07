@@ -3,7 +3,7 @@
 
 <?php
 require_once('../includes/connect.php');
-$stmt = $connection->prepare('SELECT id,title FROM projects ORDER BY title ASC');
+$stmt = $connection->prepare('SELECT project_id,project_title FROM projects ORDER BY title ASC');
 $stmt->execute();
 
 
