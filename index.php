@@ -6,7 +6,7 @@ require_once('includes/connect.php');
 
 
 $projectQuery = "SELECT p.project_id, m.file_url, p.project_title, p.project_description FROM projects p JOIN media m ON p.project_id = m.project_id LIMIT 6";
-$stmt = $connect->prepare("SELECT p.project_id, m.file_url, p.project_title, p.project_description FROM projects p JOIN media m ON p.project_id = m.project_id LIMIT 6");
+$stmt = $connection->prepare("SELECT p.project_id, m.file_url, p.project_title, p.project_description FROM projects p JOIN media m ON p.project_id = m.project_id LIMIT 6");
 $stmt->execute();
 ?>
 
