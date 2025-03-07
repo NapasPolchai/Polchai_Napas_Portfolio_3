@@ -1,6 +1,6 @@
 <?php
  
- //$connect = mysqli_connect('localhost','root','root','bookstore'); 
+ $connection = mysqli_connect('localhost','root','root','Portfolio'); 
 
  $dsn = "mysql:host=localhost;dbname=Portfolio;charset=utf8mb4";
  try {
