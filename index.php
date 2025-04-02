@@ -3,10 +3,17 @@
 <?php
 require_once('includes/connect.php');
 
-
-
-$projectQuery = "SELECT p.project_id, m.file_url, p.project_title, p.project_description FROM projects p JOIN media m ON p.project_id = m.project_id LIMIT 6";
-$stmt = $connection->prepare("SELECT p.project_id, m.file_url, p.project_title, p.project_description FROM projects p JOIN media m ON p.project_id = m.project_id LIMIT 6");
+// Modified query to fetch only one image per project (e.g., the cover image)
+$projectQuery = "SELECT p.project_id, m.file_url, p.project_title, p.project_description 
+                 FROM projects p 
+                 JOIN media m ON p.project_id = m.project_id 
+                 WHERE m.media_id = (
+                     SELECT MIN(media_id) 
+                     FROM media 
+                     WHERE project_id = p.project_id
+                 ) 
+                 LIMIT 6";
+$stmt = $connection->prepare($projectQuery);
 $stmt->execute();
 ?>
 
@@ -30,8 +37,7 @@ $stmt->execute();
 
                 <ul class="mobile-nav" id="mobileNav">
                     <li>
-                        <div id="mobileNavCloseBtn"><img src="img/close.svg" alt="">
-                        </div>
+                        <div id="mobileNavCloseBtn"><img src="img/close.svg" alt=""></div>
                     </li>
                     <li><a href="projects.php">Projects</a></li>
                     <li><a href="experiences.php">Experience</a></li>
@@ -71,13 +77,6 @@ $stmt->execute();
             <div id="hero-text3" class="xl-col-start-1 xl-col-end-9 l-col-start-1 l-col-end-9 col-span-full">
                 <h2>Graphic <span>Design</span> Edge</h2>
             </div>
-
-            <!-- <div class="hero-text col-span-full">
-                <h1>Web <span>Designer</span>
-                    <br> <img src="img/reel:.gif" alt="" id="reel">with a <br>
-                    Graphic <span>Design</span> Edge
-                </h1>
-            </div> -->
         </section>
 
         <div class="grid-con">
@@ -102,8 +101,7 @@ $stmt->execute();
                 <img src="img/memoji.png" alt="">
             </div>
 
-            <div id="about-text" class="l-col-start-6 l-col-end-13  m-col-start-6 m-col-end-13 col-span-full">
-
+            <div id="about-text" class="l-col-start-6 l-col-end-13 m-col-start-6 m-col-end-13 col-span-full">
                 <div id="status-bar">
                     <div id="status-indicator"></div>
                     <div id="status-text">Available</div>
@@ -111,12 +109,10 @@ $stmt->execute();
 
                 <h2>
                     From Nonthaburi, Thailand. Former Graphic <span>Designer </span>and Photographer turned to Web
-                    <span>Designer </span>, with a
-                    love for <span> design</span>. Wherever it is, I’d rather be on wheels.
+                    <span>Designer </span>, with a love for <span>design</span>. Wherever it is, I’d rather be on wheels.
                 </h2>
             </div>
         </section>
-
 
         <section id="bg-black-1">
             <div class="grid-con">
@@ -126,8 +122,7 @@ $stmt->execute();
                     </div>
                     <p>
                         <span class="bold"> Ui / UX Design - </span> 4 years of experience as a UI / UX designer. I
-                        worked with many types of clients
-                        such as hospitals, Interior design companies, Jewelry brands, and Insurance companies.
+                        worked with many types of clients such as hospitals, Interior design companies, Jewelry brands, and Insurance companies.
                     </p>
                 </div>
 
@@ -136,8 +131,7 @@ $stmt->execute();
                         <img src="img/landing-desktop/SWU.png" alt="">
                     </div>
                     <p>
-                        <span class="bold">Graphic Design - </span> Specializing in Illustration, then became a graphic
-                        designer.
+                        <span class="bold">Graphic Design - </span> Specializing in Illustration, then became a graphic designer.
                     </p>
                 </div>
 
@@ -148,108 +142,30 @@ $stmt->execute();
                 <?php
                 if ($stmt->rowCount() > 0) {
                     $index = 0;
+                    $classes = [
+                        'col-span-full l-col-start-1 l-col-span-8 m-col-start-1 m-col-span-8',
+                        'col-span-full l-col-start-9 l-col-span-4 m-col-start-9 m-col-span-4',
+                        'col-span-full l-col-start-1 l-col-end-7 m-col-start-1 m-col-span-6',
+                        'col-span-full l-col-start-7 l-col-end-13 m-col-start-7 m-col-span-6',
+                        'col-span-full l-col-start-1 l-col-end-5 m-col-start-1 m-col-span-5',
+                        'col-span-full l-col-start-5 l-col-end-13 m-col-start-6 m-col-span-7',
+                    ];
                     while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                        $classes = [
-                            'col-span-full l-col-start-1 l-col-span-8 m-col-start-1 m-col-span-8',
-                            'col-span-full l-col-start-9 l-col-span-4 m-col-start-9 m-col-span-4',
-                            'col-span-full l-col-start-1 l-col-end-7 m-col-start-1 m-col-span-6',
-                            'col-span-full l-col-start-7 l-col-end-13 m-col-start-7 m-col-span-6',
-                            'col-span-full l-col-start-1 l-col-end-5 m-col-start-1 m-col-span-5',
-                            'col-span-full l-col-start-5 l-col-end-13 m-col-start-6 m-col-span-7',
-                        ];
-                        echo '<div class="card '.$classes[$index].'">
-                            <a href="casestudy.php?project_id='.$row['project_id'].'">
-                                <img src="./img'.$row['file_url'].'" alt="">
+                        $classIndex = $index % count($classes); // Cycle through classes
+                        echo '<div class="card ' . $classes[$classIndex] . '">
+                            <a href="casestudy.php?project_id=' . $row['project_id'] . '">
+                                <img src="./img' . htmlspecialchars($row['file_url']) . '" alt="' . htmlspecialchars($row['project_title']) . '">
                                 <p>
-                                    <span class="bold">'. $row['project_title'] .'</span> - '.$row['project_description'].'
+                                    <span class="bold">' . htmlspecialchars($row['project_title']) . '</span> - ' . htmlspecialchars($row['project_description']) . '
                                 </p>
                             </a>
                         </div>';
-                        $index += 1;
+                        $index++;
                     }
+                } else {
+                    echo '<div class="col-span-full"><p>No projects found.</p></div>';
                 }
                 ?>
-
-                <!-- <div class="card col-span-full l-col-start-1 l-col-span-8 m-col-start-1 m-col-span-8">
-                    <a href="casestudy.html">
-                        <img src="img/landing-desktop/Welter-SEA.png" alt="">
-                        <p>
-                            <span class="bold">Ui / UX Design</span> - 4 years of experience as a UI / UX
-                            designer. I worked with many types of clients such as hospitals, Interior design companies,
-                            Jewelry brands, and Insurance companies.
-                        </p>
-                    </a>
-
-                </div> -->
-
-                <!-- <div class="card col-span-full l-col-start-1 l-col-span-8 m-col-start-1 m-col-span-8">
-                    <a href="casestudy.html">
-                        <img src="img/landing-desktop/Welter-SEA.png" alt="">
-                        <p>
-                            <span class="bold">Ui / UX Design</span> - 4 years of experience as a UI / UX
-                            designer. I worked with many types of clients such as hospitals, Interior design companies,
-                            Jewelry brands, and Insurance companies.
-                        </p>
-                    </a>
-
-                </div>
-
-                <div class="card col-span-full l-col-start-9 l-col-span-4 m-col-start-9 m-col-span-4">
-                    <a href="casestudy.html">
-                        <img src="img/landing-desktop/NPD-project.png" alt="">
-                        <p>
-                            <span class="bold">Graphic Design - </span> Specializing in Illustration, then became a
-                            graphic
-                            designer.
-                        </p>
-                    </a>
-                </div>
-
-                <div class="card  l-col-start-1 l-col-end-7 m-col-start-1 m-col-span-6 col-span-full">
-                    <a href="casestudy.html">
-                        <img src="img/landing-desktop/MEDPARK.png" alt="">
-                        <p>
-                            <span class="bold">Graphic Design - </span> Specializing in Illustration, then became a
-                            graphic
-                            designer.
-                        </p>
-                    </a>
-                </div>
-
-                <div class="card l-col-start-7 l-col-end-13 m-col-start-7 m-col-span-6 col-span-full">
-                    <a href="casestudy.html">
-                        <img src="img/landing-desktop/SKY.png" alt="">
-                        <p>
-                            <span class="bold">Graphic Design - </span> Specializing in Illustration, then became a
-                            graphic
-                            designer.
-                        </p>
-                    </a>
-                </div>
-
-                <div class="card l-col-start-1 l-col-end-5 m-col-start-1 m-col-span-5 col-span-full">
-                    <a href="casestudy.html">
-                        <img src="img/landing-desktop/Logo-ShopSabuy.png" alt="">
-                        <p>
-                            <span class="bold">Graphic Design - </span> Specializing in Illustration, then became a
-                            graphic
-                            designer.
-                        </p>
-                    </a>
-
-                </div> -->
-
-                <!-- <div class="card l-col-start-5 l-col-end-13 m-col-start-6 m-col-span-7 col-span-full">
-                    <a href="casestudy.html">
-                        <img src="img/landing-desktop/SLI.png" alt="">
-                        <p>
-                            <span class="bold">Ui / UX Design</span> - 4 years of experience as a UI / UX
-                            designer. I worked with many types of clients such as hospitals, Interior design companies,
-                            Jewelry brands, and Insurance companies.
-                        </p>
-                    </a>
-
-                </div> -->
             </div>
         </section>
 
@@ -268,24 +184,20 @@ $stmt->execute();
                     </div>
                 </div>
 
-                <img class="l-col-start-7 l-col-span-6 m-col-start-7 m-col-span-6 hide-mob"
-                    src="img/place-holder-img-3.png" alt="">
+                <img class="l-col-start-7 l-col-span-6 m-col-start-7 m-col-span-6 hide-mob" src="img/place-holder-img-3.png" alt="">
             </div>
             <img class="hide-desk" src="img/place-holder-img-3.png" alt="">
         </section>
-
 
         <footer>
             <video class="footer-vid" autoplay loop muted playsinline>
                 <source src="img/footer-bg.mp4" type="video/mp4">
             </video>
             <div class="footer-con">
-                <h2>Have <br><span>an idea?</span> </h2>
+                <h2>Have <br><span>an idea?</span></h2>
                 <a href="contact.php">
                     <button class="tell">Tell Me</button>
                 </a>
-                
-
                 <div class="contact">
                     <button id="btn-1">polchai.napas@gmail.com</button>
                     <button id="btn-2">+1 (416) 302 6763</button>
@@ -293,25 +205,23 @@ $stmt->execute();
             </div>
         </footer>
     </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/video.js"></script>
+    <script src="js/scroll.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@studio-freight/lenis@latest/bundled/lenis.min.js"></script>
+    <script>
+        const lenis = new Lenis();
+
+
+        function raf(time) {
+            lenis.raf(time);
+            requestAnimationFrame(raf);
+        }
+        requestAnimationFrame(raf);
+    </script>
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 </body>
-<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
-<script src="js/main.js"></script>
-<script src="js/video.js"></script>
-<script src="js/scroll.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@studio-freight/lenis@latest/bundled/lenis.min.js"></script>
-<script>
-    const lenis = new Lenis()
-    lenis.on('scroll', (e) => {
-        console.log(e)
-    })
-
-    function raf(time) {
-        lenis.raf(time)
-        requestAnimationFrame(raf)
-    }
-    requestAnimationFrame(raf)
-</script>
-<script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
-
 </html>
