@@ -141,14 +141,7 @@
         x: 0,
         duration: 1,
 
-        scrollTrigger: {
-            trigger: ExperiencesCard,
-            toggleActions: "play pause resume pause",
-            start: '0% 30%',
-            end: '20% 30%',
-            scrub: true,
-            markers: false,
-        }
+       
 
     });
 
@@ -209,14 +202,6 @@
         x: 0,
         duration: 1,
 
-        scrollTrigger: {
-            trigger: CaseTitle,
-            toggleActions: "play pause resume pause",
-            start: '-70% 10%',
-            end: '-50% 10%',
-            scrub: true,
-            markers: false,
-        }
 
     });
 
@@ -226,14 +211,7 @@
         x: 0,
         duration: 1,
 
-        scrollTrigger: {
-            trigger: Challenge,
-            toggleActions: "play pause resume pause",
-            start: '-70% center',
-            end: '-50% center',
-            scrub: true,
-            markers: false,
-        }
+      
 
     });
 

@@ -2,47 +2,42 @@
 // Include the database connection file
 require_once 'includes/connect.php';
 
-// Check if $connect is available
-if (!isset($connect) || !$connect) {
-    die("Error: Database connection failed. Please check includes/connect.php.");
-}
-
-// Check if form was submitted via POST
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Sanitize and retrieve form data
-    $name = trim($_POST['name'] ?? '');
-    $email = trim($_POST['email'] ?? '');
-    $msg = trim($_POST['message'] ?? '');
-
-    $errors = [];
-
-    // Validation
-    if (empty($name)) {
-        $errors['name'] = 'Name can\'t be empty';
+try {
+    // Check if $pdo is available
+    if (!isset($connection)) {
+        throw new Exception("Database connection failed. Please check includes/connect.php.");
     }
 
-    if (empty($msg)) {
-        $errors['message'] = 'Message field can\'t be empty';
-    }
+    // Check if form was submitted via POST
+    if ($_SERVER["REQUEST_METHOD"] == "POST") {
+        // Sanitize and retrieve form data
+        $name = trim($_POST['name'] ?? '');
+        $email = trim($_POST['email'] ?? '');
+        $msg = trim($_POST['message'] ?? '');
 
-    if (empty($email)) {
-        $errors['email'] = 'You must provide an email';
-    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        $errors['email'] = 'You must provide a valid email';
-    }
+        $errors = [];
 
-    // Process if no errors
-    if (empty($errors)) {
-        // Prepare SQL statement to prevent SQL injection
-        $query = "INSERT INTO contact (name, email, message) VALUES (?, ?, ?)";
-        $stmt = mysqli_prepare($connect, $query);
+        // Validation
+        if (empty($name)) {
+            $errors['name'] = "Name can't be empty";
+        }
+        if (empty($msg)) {
+            $errors['message'] = "Message field can't be empty";
+        }
+        if (empty($email)) {
+            $errors['email'] = "You must provide an email";
+        } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $errors['email'] = "You must provide a valid email";
+        }
 
-        if ($stmt) {
-            // Bind parameters and execute
-            mysqli_stmt_bind_param($stmt, "sss", $name, $email, $msg);
-            $result = mysqli_stmt_execute($stmt);
+        // Process if no errors
+        if (empty($errors)) {
+            // Prepare SQL statement to prevent SQL injection
+            $query = "INSERT INTO contact (name, email, message) VALUES (:name, :email, :message)";
+            $stmt = $connection->prepare($query);
 
-            if ($result) {
+            // Execute statement
+            if ($stmt->execute([':name' => $name, ':email' => $email, ':message' => $msg])) {
                 // Send email notification
                 $to = 'polchai.napas@gmail.com';
                 $subject = 'New Message from Your Portfolio Site!';
@@ -63,24 +58,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     echo "Failed to send email.";
                 }
             } else {
-                echo "Database insertion failed: " . mysqli_error($connect);
+                echo "Database insertion failed.";
             }
-
-            // Close the statement
-            mysqli_stmt_close($stmt);
         } else {
-            echo "Query preparation failed: " . mysqli_error($connect);
+            // Display validation errors
+            foreach ($errors as $error) {
+                echo $error . '<br>';
+            }
         }
     } else {
-        // Display validation errors
-        foreach ($errors as $error) {
-            echo $error . '<br>';
-        }
+        echo "Invalid request method. Please submit the form.";
     }
-} else {
-    echo "Invalid request method. Please submit the form.";
+} catch (Exception $e) {
+    echo "Error: " . $e->getMessage();
 }
-
-// Close the database connection
-mysqli_close($connect);
 ?>
